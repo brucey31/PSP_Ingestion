@@ -175,3 +175,6 @@ print 'Renaming Adyen_raw_2 to Adyen_raw'
 cursor.execute("alter table adyen_raw_2 rename to adyen_raw;")
 
 print "Complete\nEnjoy your Adyen Data"
+
+conn.commit()
+conn.close()
