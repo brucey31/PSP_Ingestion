@@ -34,7 +34,7 @@ for bins in search_bins:
 
     # response = requests.get('https://api.bincodes.com/bin-checker.php?api_key=b3783b61d75789cf743d3acbcf1ae5f2&bin=%s' % bin_to_search)
     try:
-        r = requests.get('https://api.bincodes.com/bin-checker.php?api_key=b3783b61d75789cf743d3acbcf1ae5f2&bin=%s' % bin_to_search)
+        r = requests.get('http://api.bincodes.com/bin-checker.php?api_key=b3783b61d75789cf743d3acbcf1ae5f2&bin=%s' % bin_to_search)
         tree = ET.fromstring(r.text)
 
         bin = tree.find("bin").text
