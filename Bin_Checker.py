@@ -55,8 +55,7 @@ for bins in search_bins:
         continue
 
 
-
-
+print 'Complete'
 conn.commit()
 conn.close()
 
