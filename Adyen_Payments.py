@@ -20,6 +20,8 @@ ADYEN_KEY = config.get('Adyen Keys', 'pass')
 
 merchant_accounts = ["BusuuCOM", "BusuuBRL", "BusuuRUB", "BusuuUSD", "BusuuZuora", "BusuuZuoraRecurring"]
 
+# start_date = date(2015, 01, 01)
+# end_date = date(2015, 7, 10)
 start_date = date.today() - timedelta(days=30)
 end_date = date.today()
 
@@ -40,11 +42,11 @@ while start_date < end_date:
                 continue
 
             with open('received_payments_report_%s.csv' % start_date2, 'rb') as csvfile:
-                reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+                reader = csv.reader(csvfile, dialect='excel', delimiter=',', quotechar='"')
 
                 iterator = 0
                 with open('%s_received_payments_report_%s.csv' % (merchant, start_date2), 'w+b') as outfile:
-                    writer = csv.writer(outfile, delimiter=",")
+                    writer = csv.writer(outfile, delimiter="|")
 
                     print "Fixing Adyen records for %s on %s" % (merchant, start_date)
 
@@ -82,7 +84,7 @@ while start_date < end_date:
                             shopper_interaction = line[11]
                             row.append(shopper_interaction)
 
-                            name = line[12]
+                            name = line[12].replace("|", "")
                             row.append(name)
 
                             shopper_pan = line[13]
@@ -164,9 +166,7 @@ cursor.execute(
     "create table adyen_raw_2 (merchant varchar(25),psp_ref varchar(100),merchant_ref varchar(100),payment_method varchar(250),creation_timestamp timestamp,timezone varchar(5),currency varchar(15),amount float,risk_score int,shopper_interaction varchar(100),name varchar(2000),shopper_pan varchar(50),ip varchar(50),country varchar(50),issuer_name varchar(250),issuer_id varchar(250),issuer_city varchar(50),issuer_country varchar(40),acquirer_response varchar(500),shopper_email varchar(250),shopper_reference varchar(250),cvc2_response varchar(20),AVS_response int,billing_street varchar(50),acquirer_reference varchar(100),payment_card varchar(50),raw_acquirer_response varchar(250));")
 
 print "Copying Adyen Data from S3 to  \n  Adyen_raw_2"
-cursor.execute(
-    "COPY adyen_raw_2 FROM 's3://bibusuu/PSP_Reports/Adyen/'  CREDENTIALS 'aws_access_key_id=%s;aws_secret_access_key=%s' csv;" % (
-    AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY))
+cursor.execute("COPY adyen_raw_2 FROM 's3://bibusuu/PSP_Reports/Adyen/'  CREDENTIALS 'aws_access_key_id=%s;aws_secret_access_key=%s';" % (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY))
 
 print "Deleting old table Adyen_raw"
 cursor.execute("drop table if exists adyen_raw;")

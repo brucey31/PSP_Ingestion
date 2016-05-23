@@ -21,7 +21,7 @@ conn = psycopg2.connect(conn_string)
 cursor = conn.cursor()
 
 print "Finding bins that have not been looked up yet"
-cursor.execute("select distinct adyen.issuer_id from adyen_raw adyen left join bank_bin_code_list list on list.bin = adyen.issuer_id where left(adyen.issuer_id,4) between 0 and 9999 and len(adyen.issuer_id) = 6 and list.bin is null limit 500;")
+cursor.execute("select distinct adyen.issuer_id from adyen_raw adyen left join bank_bin_code_list list on list.bin = adyen.issuer_id where left(adyen.issuer_id,4) between 0 and 9999 and len(adyen.issuer_id) = 6 and list.bin is null limit 100;")
 
 search_bins = cursor.fetchall()
 
