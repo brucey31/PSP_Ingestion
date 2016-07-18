@@ -162,8 +162,7 @@ print "Deleting old table Adyen_raw_2"
 cursor.execute("drop table if exists adyen_raw_2;")
 
 print "Creating new table \n Adyen_raw_2"
-cursor.execute(
-    "create table adyen_raw_2 (merchant varchar(25),psp_ref varchar(100),merchant_ref varchar(100),payment_method varchar(250),creation_timestamp timestamp,timezone varchar(5),currency varchar(15),amount float,risk_score int,shopper_interaction varchar(100),name varchar(2000),shopper_pan varchar(50),ip varchar(50),country varchar(50),issuer_name varchar(250),issuer_id varchar(250),issuer_city varchar(50),issuer_country varchar(40),acquirer_response varchar(500),shopper_email varchar(250),shopper_reference varchar(250),cvc2_response varchar(20),AVS_response int,billing_street varchar(50),acquirer_reference varchar(100),payment_card varchar(50),raw_acquirer_response varchar(250));")
+cursor.execute("create table adyen_raw_2 (merchant varchar(25),psp_ref varchar(100),merchant_ref varchar(100),payment_method varchar(250),creation_timestamp timestamp,timezone varchar(5),currency varchar(15),amount float,risk_score int,shopper_interaction varchar(100),name varchar(2000),shopper_pan varchar(50),ip varchar(50),country varchar(50),issuer_name varchar(250),issuer_id varchar(250),issuer_city varchar(50),issuer_country varchar(40),acquirer_response varchar(500),shopper_email varchar(250),shopper_reference varchar(250),cvc2_response varchar(20),AVS_response int,billing_street varchar(50),acquirer_reference varchar(100),payment_card varchar(50),raw_acquirer_response varchar(250));")
 
 print "Copying Adyen Data from S3 to  \n  Adyen_raw_2"
 cursor.execute("COPY adyen_raw_2 FROM 's3://bibusuu/PSP_Reports/Adyen/'  CREDENTIALS 'aws_access_key_id=%s;aws_secret_access_key=%s';" % (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY))
@@ -171,8 +170,11 @@ cursor.execute("COPY adyen_raw_2 FROM 's3://bibusuu/PSP_Reports/Adyen/'  CREDENT
 print "Deleting old table Adyen_raw"
 cursor.execute("drop table if exists adyen_raw;")
 
-print 'Renaming Adyen_raw_2 to Adyen_raw'
-cursor.execute("alter table adyen_raw_2 rename to adyen_raw;")
+print "Aggregating adyen_raw"
+cursor.execute("create table adyen_raw as select case when merchant in ('BusuuCOM','BusuuRUB','BusuuUSD','BusuuBRL') and shopper_interaction = 'Ecommerce' then 'New' when merchant in ('BusuuCOM','BusuuRUB','BusuuUSD','BusuuBRL') and shopper_interaction = 'ContAuth' then 'Recurring' when merchant = 'BusuuZuora' then 'New' when merchant = 'BusuuZuoraRecurrring' then 'Recurring' end as recurring, adyen.*  from adyen_raw_2 adyen;")
+
+print 'Deleting adyen_raw2'
+cursor.execute("drop table if exists adyen_raw_2;")
 
 print "Complete\nEnjoy your Adyen Data"
 
