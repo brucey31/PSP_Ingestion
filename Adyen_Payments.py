@@ -171,7 +171,7 @@ print "Deleting old table Adyen_raw"
 cursor.execute("drop table if exists adyen_raw;")
 
 print "Aggregating adyen_raw"
-cursor.execute("create table adyen_raw as select case when merchant in ('BusuuCOM','BusuuRUB','BusuuUSD','BusuuBRL') and shopper_interaction = 'Ecommerce' then 'New' when merchant in ('BusuuCOM','BusuuRUB','BusuuUSD','BusuuBRL') and shopper_interaction = 'ContAuth' then 'Recurring' when merchant = 'BusuuZuora' then 'New' when merchant = 'BusuuZuoraRecurrring' then 'Recurring' end as recurring, adyen.*  from adyen_raw_2 adyen;")
+cursor.execute("create table adyen_raw as select case when merchant in ('BusuuCOM','BusuuRUB','BusuuUSD','BusuuBRL') and shopper_interaction = 'Ecommerce' then 'New' when merchant in ('BusuuCOM','BusuuRUB','BusuuUSD','BusuuBRL') and shopper_interaction = 'ContAuth' then 'Recurring' when merchant = 'BusuuZuora' then 'New' when merchant = 'BusuuZuoraRecurring' then 'Recurring' end as recurring, adyen.*  from adyen_raw_2 adyen;")
 
 print 'Deleting adyen_raw2'
 cursor.execute("drop table if exists adyen_raw_2;")
