@@ -46,16 +46,19 @@ while start_date <= end_date:
     else:
 
         for country in countries:
+            try:
+                print "Retrieving data for %s on %s" % (country, start_date)
 
-            print "Retrieving data for %s on %s" % (country, start_date)
+                sftp.get('allpago/%s_Custom_report_BIP Extract_%s.csv' %(country, start_date), '%s_Custom_report_BIP Extract_%s.csv' %(country, start_date))
 
-            sftp.get('allpago/%s_Custom_report_BIP Extract_%s.csv' %(country, start_date), '%s_Custom_report_BIP Extract_%s.csv' %(country, start_date))
+                print "Uploading payment for %s on %s to s3" % (country, start_date)
+                call(["s3cmd", "put", '%s_Custom_report_BIP Extract_%s.csv' % (country, start_date),'s3://bibusuu/PSP_Reports/Allpago/New_Files/%s/%s_Custom_report_BIP Extract_%s.csv' %(start_date, country, start_date)])
 
-            print "Uploading payment for %s on %s to s3" % (country, start_date)
-            call(["s3cmd", "put", '%s_Custom_report_BIP Extract_%s.csv' % (country, start_date),'s3://bibusuu/PSP_Reports/Allpago/New_Files/%s/%s_Custom_report_BIP Extract_%s.csv' %(start_date, country, start_date)])
+                print "Removing Local File"
+                os.remove('%s_Custom_report_BIP Extract_%s.csv' %(country, start_date))
 
-            print "Removing Local File"
-            os.remove('%s_Custom_report_BIP Extract_%s.csv' %(country, start_date))
+            except Exception as e:
+                print "Problem grabbing the data, try again tomorrow?"
 
     start_date = start_date + timedelta(days=1)
 
